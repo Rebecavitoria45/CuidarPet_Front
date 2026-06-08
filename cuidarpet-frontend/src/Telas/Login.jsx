@@ -108,7 +108,7 @@ export default function Login() {
 
           <footer className="mt-8 pt-6 border-t border-gray-100 w-full text-center">
             <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
-              © 2024 CuidarPet Sistema Veterinário <br/>Uso restrito para colaboradores autorizados.
+              © 2026 CuidarPet Sistema Veterinário <br/>Uso restrito para colaboradores autorizados.
             </p>
           </footer>
         </div>
