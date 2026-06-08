@@ -55,7 +55,7 @@ export default function CadastrarUsuario() {
           <div className="lg:col-span-8 min-w-0">
             <div className="bg-white rounded-2xl border border-outline-variant p-8 shadow-sm">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-on-surface mb-2">Cadastrar Novo Usuário</h2>
+                <h2 className="text-2xl font-bold text-on-surface mb-2">Cadastrar Usuário</h2>
                 <p className="text-on-surface-variant text-sm">Insira as informações básicas para criar uma nova conta de acesso ao sistema.</p>
               </div>
 

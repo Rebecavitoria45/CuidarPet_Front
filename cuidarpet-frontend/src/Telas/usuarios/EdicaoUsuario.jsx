@@ -90,7 +90,7 @@ export default function EditarUsuario() {
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
                     <span className="p-2 bg-primary-container/10 text-primary rounded-lg material-symbols-outlined">edit_square</span>
-                    <h2 className="text-2xl font-bold text-on-surface">Editar Cadastro</h2>
+                    <h2 className="text-2xl font-bold text-on-surface">Editar Cadastro Usuário</h2>
                 </div>
                 <p className="text-on-surface-variant text-sm">Alteração de cargos e informações cadastrais de colaboradores.</p>
               </div>

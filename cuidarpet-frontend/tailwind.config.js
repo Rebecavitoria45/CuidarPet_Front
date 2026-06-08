@@ -9,6 +9,7 @@ export default {
       colors: {
         "primary-container": "#f57c00",
         "primary": "#964900",
+        "secondary": "#22c55e", // verde
         "surface-container-lowest": "#ffffff",
         "on-surface-variant": "#574235",
         "outline-variant": "#dec1af",

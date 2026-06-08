@@ -182,7 +182,7 @@ function RoleBadge({ role }) {
   const styles = {
     VETERINARIO: "bg-primary-container/10 text-primary",
     ADMIN: "bg-secondary-container/30 text-on-secondary-container",
-    ATENDENTE: "bg-gray-100 text-gray-600"
+    ATENDENTE: "bg-green-100 text-gray-600"
   };
   return (
     <span className={`px-3 py-1 text-[10px] font-bold rounded-full uppercase ${styles[role] || styles.ATENDENTE}`}>
