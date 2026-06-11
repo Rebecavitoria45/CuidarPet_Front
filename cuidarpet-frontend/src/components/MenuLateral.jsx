@@ -5,6 +5,7 @@ export default function Sidebar() {
   
   // Pegamos os dados do usuário salvos no login
   const userData = JSON.parse(localStorage.getItem('user') || '{}');
+  const isAdmin = userData.role === 'ADMIN';
 
   const handleLogout = () => {
     localStorage.clear();
@@ -28,10 +29,12 @@ export default function Sidebar() {
           <span className="text-sm font-medium">Visão Geral</span>
         </NavLink>
 
-        <NavLink to="/usuarios" className={({ isActive }) => `${baseClass} ${isActive ? activeClass : ''}`}>
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>person</span>
-          <span className="text-sm font-medium">Usuários</span>
-        </NavLink>
+        {isAdmin && (
+          <NavLink to="/usuarios" className={({ isActive }) => `${baseClass} ${isActive ? activeClass : ''}`}>
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>person</span>
+            <span className="text-sm font-medium">Usuários</span>
+          </NavLink>
+        )}
 
         <NavLink to="/clientes" className={({ isActive }) => `${baseClass} ${isActive ? activeClass : ''}`}>
           <span className="material-symbols-outlined">group</span>

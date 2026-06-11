@@ -1,24 +1,27 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Telas/Login';
 import Layout from './Telas/Layout';
-import DashboardPrincipal from './Telas/DashBoardAdmin';
 import { ProtectedRoute } from './config/ProtectRouter'; 
 import GerenciarUsuarios from './Telas/usuarios/GerenciarUsuarios';
 import CadastrarUsuario from './Telas/usuarios/CadastrarUsuario';
 import EditarUsuario from './Telas/usuarios/EdicaoUsuario';
+import GerenciarClientes from './Telas/clientes/GerenciarClientes';
+import CadastrarCliente from './Telas/clientes/CadastrarCliente';
+import EditarCliente from './Telas/clientes/EdicaoCliente';
+import Home from './Telas/Home';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        {/* ROTA PROTEGIDA */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route 
           path="/dashboard" 
           element={
             <ProtectedRoute>
               <Layout>
-              <DashboardPrincipal />
+              <Home />
              </Layout>
             </ProtectedRoute>
           } 
@@ -26,19 +29,33 @@ function App() {
         <Route 
   path="/usuarios/cadastro" 
   element={
-    <ProtectedRoute>
+    <ProtectedRoute requiredRole="ADMIN">
        <CadastrarUsuario />
     </ProtectedRoute>
   } 
 />
-<Route path="/usuarios/editar/:id" 
+<Route path="/clientes" 
 element={<ProtectedRoute>
+  <GerenciarClientes />
+  </ProtectedRoute>} />
+
+  <Route path="/clientes/cadastro" 
+  element={<ProtectedRoute>
+    <CadastrarCliente />
+  </ProtectedRoute>} />
+
+ <Route path="/clientes/editar/:id" 
+ element={<ProtectedRoute>
+  <EditarCliente />
+  </ProtectedRoute>} />
+<Route path="/usuarios/editar/:id" 
+element={<ProtectedRoute requiredRole="ADMIN">
   <EditarUsuario />
 </ProtectedRoute>} />
         <Route 
            path="/usuarios" 
           element={
-               <ProtectedRoute>
+               <ProtectedRoute requiredRole="ADMIN">
                   <Layout>
                     <GerenciarUsuarios />
                  </Layout>

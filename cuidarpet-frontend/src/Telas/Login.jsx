@@ -68,7 +68,7 @@ export default function Login() {
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all"
                   value={matricula}
                   onChange={(e) => setMatricula(e.target.value)}
-                  placeholder="000.000-X"
+                  placeholder="000"
                   required
                 />
               </div>

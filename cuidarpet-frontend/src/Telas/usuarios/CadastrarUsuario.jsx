@@ -100,7 +100,7 @@ export default function CadastrarUsuario() {
                       name="matricula"
                       value={formData.matricula}
                       onChange={handleChange}
-                      placeholder="CP-2024-001"
+                      placeholder="001"
                       required
                     />
                   </div>
