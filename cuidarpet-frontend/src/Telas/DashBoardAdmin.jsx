@@ -8,6 +8,9 @@ export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [usuariosAtivos, setUsuariosAtivos] = useState(0);
 
+  const [totalClientes, setTotalClientes] = useState(0);
+  const [ultimoCliente, setUltimoCliente] = useState('...');
+
   const navigate = useNavigate();
   
 
@@ -24,7 +27,21 @@ export default function Dashboard() {
         setUsuariosAtivos(ativos);
       })
       .catch(err => console.error("Erro ao buscar usuários", err));
+
+        // Busca dados de Clientes 
+    api.get('/clientes')
+      .then(response => {
+        const lista = response.data;
+        setTotalClientes(lista.length);
+        
+        // Pega o nome do último cliente cadastrado (último da lista)
+        if (lista.length > 0) {
+          setUltimoCliente(lista[lista.length - 1].nome);
+        }
+      })
+      .catch(err => console.error("Erro ao buscar clientes", err));
   }, []);
+  
 
   return (
     <div className="animate-entrance">
@@ -47,7 +64,7 @@ export default function Dashboard() {
         <StatCard 
           icon="person_add" 
           label="Clientes cadastrados" 
-          value="260" 
+          value={totalClientes}
           color="bg-primary-container/10 text-primary-container" 
         />
         <StatCard 
@@ -75,7 +92,7 @@ export default function Dashboard() {
         {/* Management Overview */}
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
           <SummaryMiniCard icon="pets" title="Pets" label1="Recente" value1="Max (Cão)" label2="Total" value2="489" />
-          <SummaryMiniCard icon="group" title="Clientes" label1="Novo" value1="Ricardo Gomes" label2="Total" value2="260" />
+          <SummaryMiniCard icon="group" title="Clientes" label1="Novo" value1={ultimoCliente}  label2="Total" value2={totalClientes} />
           <SummaryMiniCard icon="person" title="Usuários" label1="Ativos" value1={usuariosAtivos} label2="Total" value2={totalUsuarios} path="/usuarios" />
           <SummaryMiniCard icon="calendar_month" title="Agendamentos" label1="Hoje" value1="4" label2="Total" value2="120" />
         </div>

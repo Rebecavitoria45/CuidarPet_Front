@@ -29,7 +29,7 @@ function App() {
         <Route 
   path="/usuarios/cadastro" 
   element={
-    <ProtectedRoute requiredRole="ADMIN">
+    <ProtectedRoute  adminOnly={true}>
        <CadastrarUsuario />
     </ProtectedRoute>
   } 
@@ -49,13 +49,13 @@ element={<ProtectedRoute>
   <EditarCliente />
   </ProtectedRoute>} />
 <Route path="/usuarios/editar/:id" 
-element={<ProtectedRoute requiredRole="ADMIN">
+element={<ProtectedRoute  adminOnly={true}>
   <EditarUsuario />
 </ProtectedRoute>} />
         <Route 
            path="/usuarios" 
           element={
-               <ProtectedRoute requiredRole="ADMIN">
+               <ProtectedRoute  adminOnly={true}>
                   <Layout>
                     <GerenciarUsuarios />
                  </Layout>

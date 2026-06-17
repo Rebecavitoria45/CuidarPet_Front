@@ -90,6 +90,11 @@ export default function GerenciarUsuarios() {
                 <tr key={user.id} className={`transition-colors hover:bg-orange-50/30 ${!user.ativo ? 'opacity-70 bg-gray-50' : ''}`}>
                   <td className="px-6 py-4">
                     <p className="font-bold text-on-surface">{user.nome}</p>
+                    {user.isAdmin && (
+                      <span className="material-symbols-outlined text-amber-500 text-[18px]" title="Administrador">
+                        Admin
+                      </span>
+                    )}
                     <p className="text-xs text-on-surface-variant">{user.email}</p>
                   </td>
                   <td className="px-6 py-4 font-mono text-sm text-on-surface-variant">
@@ -181,7 +186,6 @@ function StatBox({ label, value, color }) {
 function RoleBadge({ role }) {
   const styles = {
     VETERINARIO: "bg-primary-container/10 text-primary",
-    ADMIN: "bg-secondary-container/30 text-on-secondary-container",
     ATENDENTE: "bg-green-100 text-gray-600"
   };
   return (

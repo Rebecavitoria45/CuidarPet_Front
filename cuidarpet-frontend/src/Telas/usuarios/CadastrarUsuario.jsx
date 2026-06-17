@@ -15,7 +15,8 @@ export default function CadastrarUsuario() {
     matricula: '',
     senha: '',
     role: 'ATENDENTE', // Valor inicial padrão
-    crmv: ''
+    crmv: '',
+    admin: false,
   });
 
   const handleChange = (e) => {
@@ -139,7 +140,7 @@ export default function CadastrarUsuario() {
                       required
                     >
                       <option value="ATENDENTE">Atendente</option>
-                      <option value="ADMIN">Administrador</option>
+
                       <option value="VETERINARIO">Veterinário</option>
                     </select>
                   </div>
@@ -159,6 +160,22 @@ export default function CadastrarUsuario() {
                     </div>
                   )}
                 </div>
+                {/* Campo Admin Toggle */}
+<div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+  <div className="flex items-center h-5">
+    <input
+      name="isAdmin"
+      type="checkbox"
+      checked={formData.admin}
+      onChange={(e) => setFormData({...formData, admin: e.target.checked})}
+      className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+    />
+  </div>
+  <div className="ml-2 text-sm">
+    <label className="font-bold text-on-surface">Acesso Administrativo</label>
+    <p className="text-on-surface-variant text-xs">Este usuário poderá gerenciar outros usuários e configurações.</p>
+  </div>
+</div>
 
                 {/* Botões de Ação */}
                 <div className="pt-6 border-t border-outline-variant flex items-center justify-end gap-4">
