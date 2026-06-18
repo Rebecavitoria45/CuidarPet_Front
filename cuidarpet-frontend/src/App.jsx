@@ -9,6 +9,8 @@ import GerenciarClientes from './Telas/clientes/GerenciarClientes';
 import CadastrarCliente from './Telas/clientes/CadastrarCliente';
 import EditarCliente from './Telas/clientes/EdicaoCliente';
 import GerenciarPets from './Telas/pets/GerenciamentoPets';
+import CadastrarPet from './Telas/pets/CadastrarPet';
+import EditarPet from './Telas/pets/EdicaoPet';
 import Home from './Telas/Home';
 
 function App() {
@@ -46,6 +48,14 @@ element={<ProtectedRoute>
   </ProtectedRoute>} />
 
   <Route path="/pets" element={<ProtectedRoute><GerenciarPets /></ProtectedRoute>} />
+
+      <Route path="/pets/cadastro" element={
+            <ProtectedRoute>
+               <Layout> <CadastrarPet /> </Layout>
+            </ProtectedRoute>
+        } />
+
+        <Route path="/pets/editar/:id" element={<ProtectedRoute><EditarPet /></ProtectedRoute>} />
 
  <Route path="/clientes/editar/:id" 
  element={<ProtectedRoute>

@@ -48,7 +48,7 @@ export default function GerenciarPets() {
             <p className="text-on-surface-variant">Visualize e gerencie todos os pacientes da clínica.</p>
           </div>
           <button 
-            onClick={() => navigate('/pets/novo')}
+            onClick={() => navigate('/pets/cadastro')}
             className="bg-primary-container text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-primary transition-all active:scale-95 shadow-lg shadow-orange-200"
           >
             <span className="material-symbols-outlined">add</span>
