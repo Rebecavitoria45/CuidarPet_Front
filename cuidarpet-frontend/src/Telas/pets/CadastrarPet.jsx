@@ -27,20 +27,18 @@ export default function CadastrarPet() {
   // Busca clientes conforme o usuário digita
   useEffect(() => {
     if (termoBusca.length > 2) {
-      api.get(`/clientes`) // edpoint para buscar o cliente
-        .then(response => {
-          const filtrados = response.data.filter(c => 
-            c.nome.toLowerCase().includes(termoBusca.toLowerCase()) || 
-            c.cpf.includes(termoBusca)
-          );
-          setClientesEncontrados(filtrados);
-          setMostrarDropdown(true);
-        });
+        // Faz a busca no backend agora!
+        api.get(`/clientes/buscar?nome=${termoBusca}`)
+            .then(response => {
+                setClientesEncontrados(response.data);
+                setMostrarDropdown(true);
+            })
+            .catch(err => console.error("Erro na busca remota", err));
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setMostrarDropdown(false);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMostrarDropdown(false);
     }
-  }, [termoBusca]);
+}, [termoBusca]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -182,7 +180,7 @@ export default function CadastrarPet() {
                       <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">person_search</span>
                       <input 
                         className="w-full h-12 pl-12 pr-4 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all"
-                        placeholder={clienteSelecionadoNome || "Buscar cliente por nome ou CPF..."}
+                        placeholder={clienteSelecionadoNome || "Buscar cliente por nome..."}
                         value={termoBusca}
                         onChange={(e) => setTermoBusca(e.target.value)}
                       />
