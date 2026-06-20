@@ -11,7 +11,8 @@ import EditarCliente from './Telas/clientes/EdicaoCliente';
 import GerenciarPets from './Telas/pets/GerenciamentoPets';
 import CadastrarPet from './Telas/pets/CadastrarPet';
 import EditarPet from './Telas/pets/EdicaoPet';
-import Home from './Telas/Home';
+import Dashboard from './Telas/DashBoardAdmin';
+
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-              <Home />
+              <Dashboard />
              </Layout>
             </ProtectedRoute>
           } 
