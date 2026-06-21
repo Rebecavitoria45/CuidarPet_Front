@@ -11,7 +11,7 @@ import EditarCliente from './Telas/clientes/EdicaoCliente';
 import GerenciarPets from './Telas/pets/GerenciamentoPets';
 import CadastrarPet from './Telas/pets/CadastrarPet';
 import EditarPet from './Telas/pets/EdicaoPet';
-import Dashboard from './Telas/DashBoardAdmin';
+import Dashboard from './Telas/DashBoard';
 
 
 function App() {
