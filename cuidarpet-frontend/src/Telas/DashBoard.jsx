@@ -42,16 +42,24 @@ export default function Dashboard() {
       .catch(err => console.error("Erro ao buscar pets", err));
 
 
-    // 3. Busca Agendamentos: Todos podem ver a agenda
     api.get('/agendamentos')
-      .then(response => {
-        setAgendamentos(response.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+  .then(response => {
+    console.log("Agendamentos recebidos:", response.data);
+
+    if (Array.isArray(response.data)) {
+      setAgendamentos(response.data);
+    } else {
+      // Caso a API retorne um objeto ao invés de lista
+      setAgendamentos([]);
+    }
+
+    setLoading(false);
+  })
+  .catch(err => {
+    console.error("Erro ao buscar agendamentos:", err);
+    setAgendamentos([]);
+    setLoading(false);
+  });
   }, [isAdmin, isAtendente]);
 
   return (
@@ -133,7 +141,7 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {agendamentos.length > 0 ? (
+                {Array.isArray(agendamentos) && agendamentos.length > 0 ? (
                   agendamentos.slice(0, 5).map((ag) => (
                     <tr key={ag.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 font-bold text-on-surface">{ag.horario}</td>

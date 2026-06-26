@@ -63,13 +63,13 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-auto space-y-4 pt-6 border-t border-outline-variant">
-        {/* Botão de Novo Agendamento  */}
-        {(!isVeterinario || isAdmin) && (
-            <button className="w-full bg-primary-container text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-95">
-                <span className="material-symbols-outlined">add_circle</span>
-                <span className="text-sm">Novo agendamento</span>
-            </button>
-        )}
+        <button
+          onClick={() => navigate('/agendamentos/novo')}
+          className="w-full bg-primary-container text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-95"
+>
+          <span className="material-symbols-outlined">add_circle</span>
+          <span className="text-sm">Novo agendamento</span>
+        </button>
 
         {/* Perfil */}
         <div className="flex items-center gap-3 px-2 pt-4">
