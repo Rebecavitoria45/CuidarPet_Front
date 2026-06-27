@@ -117,12 +117,14 @@ export default function CadastrarAgendamento() {
     setLoading(true);
 
     try {
-      await api.post(`/agendamentos/pet/${formData.petId}`, {
-        data: formData.data,
-        horario: formData.horario,
-        veterinarioId: formData.veterinarioId,
-        status: formData.status
-      });
+      
+      await api.post('/agendamentos', {
+      data: formData.data,
+      horario: formData.horario,
+      veterinarioId: formData.veterinarioId,
+      petId: formData.petId, // O ID do pet vai aqui dentro
+      status: formData.status
+    });
 
       alert('Agendamento realizado com sucesso!');
       navigate('/agendamentos');
