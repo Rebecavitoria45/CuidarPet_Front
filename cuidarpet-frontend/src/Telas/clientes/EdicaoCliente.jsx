@@ -22,7 +22,7 @@ export default function EditarCliente() {
     complemento: ''
   });
 
-  // 1. Buscar os dados do cliente ao carregar a página
+  //Buscar os dados do cliente ao carregar a página
   useEffect(() => {
     const carregarDadosCliente = async () => {
       try {
@@ -49,7 +49,7 @@ export default function EditarCliente() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Envia os dados atualizados para o endpoint PUT /clientes/{id}
+      // Envia os dados atualizados 
       await api.put(`/clientes/${id}`, formData);
       alert("Cadastro atualizado com sucesso!");
       navigate('/clientes');

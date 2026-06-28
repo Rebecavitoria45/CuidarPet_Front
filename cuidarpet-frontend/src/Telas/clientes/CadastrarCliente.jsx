@@ -42,7 +42,6 @@ export default function CadastrarCliente() {
   return (
     <Layout>
       <div className="w-full animate-entrance">
-        {/* Topo: Breadcrumbs seguindo o padrão da imagem */}
         <nav className="flex items-center gap-2 mb-8 text-on-surface-variant text-sm">
           <span className="cursor-pointer hover:text-primary" onClick={() => navigate('/clientes')}>Clientes</span>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
@@ -225,7 +224,7 @@ export default function CadastrarCliente() {
             </div>
           </div>
 
-          {/* Lado Direito: Card de Orientações seguindo a imagem */}
+          {/* Lado Direito: Card de Orientações */}
           <div className="lg:col-span-4">
             <div className="bg-[#fff7ed] rounded-2xl border border-[#ffedd5] p-8">
               <div className="flex items-center gap-3 mb-6">
