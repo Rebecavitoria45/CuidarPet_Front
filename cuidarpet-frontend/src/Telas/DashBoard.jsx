@@ -6,127 +6,85 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Estados de dados
+  // Estados
   const [totalUsuarios, setTotalUsuarios] = useState(0);
   const [totalClientes, setTotalClientes] = useState(0);
-  const [agendamentos, setAgendamentos] = useState([]);
+  const [totalPets, setTotalPets] = useState(0);
+  const [agendamentosDoDia, setAgendamentosDoDia] = useState([]); // Apenas os de hoje
   const [loading, setLoading] = useState(true);
-    const [totalPets, setTotalPets] = useState(0);
 
-  // Atalhos para as permissões
   const isAdmin = user.admin;
   const isAtendente = user.role === 'ATENDENTE';
-  // eslint-disable-next-line no-unused-vars
-  const isVeterinario = user.role === 'VETERINARIO';
 
   useEffect(() => {
-    // 1. Busca usuários: Apenas se for ADMIN
+    
+    const hoje = new Date().toLocaleDateString('en-CA'); // Retorna YYYY-MM-DD exatamente
+
+    // 2. Busca usuários (Admin apenas)
     if (isAdmin) {
-      api.get('/usuarios')
-        .then(response => setTotalUsuarios(response.data.length))
-        .catch(err => console.error("Erro ao buscar usuários", err));
+      api.get('/usuarios').then(res => setTotalUsuarios(res.data.length)).catch(console.error);
     }
 
-    // 2. Busca clientes: Apenas se for ADMIN ou ATENDENTE
+    // 3. Busca Clientes (Admin/Atendente)
     if (isAdmin || isAtendente) {
-      api.get('/clientes')
-        .then(response => setTotalClientes(response.data.length))
-        .catch(err => console.error("Erro ao buscar clientes", err));
+      api.get('/clientes').then(res => setTotalClientes(res.data.length)).catch(console.error);
     }
 
-    api.get('/pets')
+    // 4. Busca Pets
+    api.get('/pets').then(res => setTotalPets(res.data.length)).catch(console.error);
+
+    // 5. Busca Agendamentos de HOJE usando o endpoint de data que criamos
+    api.get(`/agendamentos/data?data=${hoje}`)
       .then(response => {
-       setTotalPets(response.data.length);
-       setLoading(false);
+        setAgendamentosDoDia(Array.isArray(response.data) ? response.data : []);
+        setLoading(false);
       })
-      .catch(err => console.error("Erro ao buscar pets", err));
+      .catch(err => {
+        console.error("Erro ao buscar agenda de hoje:", err);
+        setAgendamentosDoDia([]);
+        setLoading(false);
+      });
 
-
-    api.get('/agendamentos')
-  .then(response => {
-    console.log("Agendamentos recebidos:", response.data);
-
-    if (Array.isArray(response.data)) {
-      setAgendamentos(response.data);
-    } else {
-      // Caso a API retorne um objeto ao invés de lista
-      setAgendamentos([]);
-    }
-
-    setLoading(false);
-  })
-  .catch(err => {
-    console.error("Erro ao buscar agendamentos:", err);
-    setAgendamentos([]);
-    setLoading(false);
-  });
   }, [isAdmin, isAtendente]);
 
   return (
     <div className="animate-entrance">
-      {/* Welcome Section */}
       <section className="mb-8">
         <h2 className="text-3xl font-bold text-on-surface">
           Bem-vindo, {user.nome?.split(' ')[0] || 'Usuário'}
         </h2>
-        <p className="text-on-surface-variant">Aqui está o que está acontecendo na clínica hoje.</p>
+        <p className="text-on-surface-variant">Confira a movimentação da clínica para hoje.</p>
       </section>
 
-      {/* Quick Stats Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        
-        {/* CARD USUÁRIOS: Visível apenas para ADMIN */}
         {isAdmin && (
-          <StatCard 
-            icon="medical_services" 
-            label="Total de Usuários" 
-            value={totalUsuarios} 
-            color="bg-secondary-container/30 text-secondary" 
-          />
+          <StatCard icon="medical_services" label="Total de Usuários" value={totalUsuarios} color="bg-secondary-container/30 text-secondary" />
         )}
 
-        {/* CARD CLIENTES: Visível para ADMIN e ATENDENTE */}
         {(isAdmin || isAtendente) && (
-          <StatCard 
-            icon="person_add" 
-            label="Clientes cadastrados" 
-            value={totalClientes}
-            color="bg-primary-container/10 text-primary-container" 
-          />
+          <StatCard icon="person_add" label="Clientes cadastrados" value={totalClientes} color="bg-primary-container/10 text-primary-container" />
         )}
 
-        {/* CARD PETS: Visível para todos */}
-        <StatCard 
-          icon="pets" 
-          label="Pets Cadastrados" 
-          value={totalPets} 
-          color="bg-purple-100 text-purple-600" 
-        />
+        <StatCard icon="pets" label="Pets Cadastrados" value={totalPets} color="bg-purple-100 text-purple-600" />
         
-        {/* Card Agendamentos: Visível para todos */}
-        <div className="bg-primary-container p-6 rounded-xl shadow-xl shadow-orange-200 flex flex-col justify-between group cursor-pointer hover:-translate-y-1 transition-all text-white">
+        {/* Card Laranja: Mostra a contagem de HOJE */}
+        <div className="bg-primary-container p-6 rounded-xl shadow-xl flex flex-col justify-between text-white">
           <div className="p-3 bg-white/20 rounded-lg w-fit">
             <span className="material-symbols-outlined">calendar_today</span>
           </div>
           <div className="mt-4">
             <p className="text-white/80 text-xs font-bold uppercase tracking-wider">Agendamentos Hoje</p>
-            <h3 className="text-3xl font-bold text-white">{agendamentos.length}</h3>
+            <h3 className="text-3xl font-bold text-white">{agendamentosDoDia.length}</h3>
           </div>
         </div>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Agenda do Dia: Visível para todos */}
         <section className="lg:col-span-2 bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-white">
+          <div className="p-6 border-b border-outline-variant flex justify-between items-center">
             <h4 className="font-bold text-lg text-on-surface">Agenda do Dia</h4>
-            <button 
-              onClick={() => navigate('/agendamentos')} 
-              className="text-primary text-sm font-bold hover:underline flex items-center gap-1"
-            >
-              Ver todos
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            <button onClick={() => navigate('/agendamentos')} className="text-primary text-sm font-bold hover:underline flex items-center gap-1">
+              Ver todos <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           </div>
           
@@ -141,15 +99,12 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {Array.isArray(agendamentos) && agendamentos.length > 0 ? (
-                  agendamentos.slice(0, 5).map((ag) => (
+                {agendamentosDoDia.length > 0 ? (
+                  agendamentosDoDia.slice(0, 6).map((ag) => (
                     <tr key={ag.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-bold text-on-surface">{ag.horario}</td>
+                      <td className="px-6 py-4 font-bold text-on-surface text-sm">{ag.horario.substring(0, 5)}h</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <span className="material-symbols-outlined text-[18px]">pets</span>
-                          </div>
                           <span className="text-sm font-medium">{ag.petNome}</span>
                         </div>
                       </td>
@@ -166,7 +121,7 @@ export default function Dashboard() {
                 ) : (
                   <tr>
                     <td colSpan="4" className="px-6 py-10 text-center text-on-surface-variant italic">
-                      {loading ? 'Carregando agenda...' : 'Nenhum agendamento para hoje.'}
+                      {loading ? 'Carregando agenda...' : 'Nenhum atendimento para hoje.'}
                     </td>
                   </tr>
                 )}
@@ -182,13 +137,10 @@ export default function Dashboard() {
             {isAdmin && (
               <QuickActionButton icon="person_add_alt" label="Novo Usuário" onClick={() => navigate('/usuarios/cadastro')} />
             )}
-            
-            {/* Novo Cliente: Apenas Admin e Atendente */}
             {(isAdmin || isAtendente) && (
               <QuickActionButton icon="person_pin" label="Novo Cliente" onClick={() => navigate('/clientes/cadastro')} />
             )}
-
-            <QuickActionButton icon="event_repeat" label="Marcar Consulta" onClick={() => navigate('/agendamentos/cadastro')} />
+            <QuickActionButton icon="event_repeat" label="Marcar Consulta" onClick={() => navigate('/agendamentos/novo')} />
           </div>
         </aside>
       </div>

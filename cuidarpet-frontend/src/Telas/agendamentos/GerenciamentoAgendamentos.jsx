@@ -9,15 +9,48 @@ export default function GerenciarAgendamentos() {
   const navigate = useNavigate();
 
   const [agendamentos, setAgendamentos] = useState([]);
+  const [agendamentosExibidos, setAgendamentosExibidos] = useState([]); // Lista que a tabela realmente mostra
   const [veterinarios, setVeterinarios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [termoPetFiltro, setTermoPetFiltro] = useState('');
+const [petsSugeridos, setPetsSugeridos] = useState([]);
+const [mostrarDropdownFiltro, setMostrarDropdownFiltro] = useState(false);
+const [petSelecionadoFiltro, setPetSelecionadoFiltro] = useState(null); // Armazena o pet escolhido
 
-  // Estados dos Filtros
-  const [filtroTexto, setFiltroTexto] = useState('');
-  const [filtroStatus, setFiltroStatus] = useState('Todos');
-  const [filtroVet, setFiltroVet] = useState('Todos');
-  const [filtroData, setFiltroData] = useState('');
-  const [filtroHorario, setFiltroHorario] = useState('');
+// Busca dinâmica de pets para o filtro
+useEffect(() => {
+  if (termoPetFiltro.length > 2) {
+    api.get(`/pets/buscar?nome=${termoPetFiltro}`)
+      .then(res => {
+        setPetsSugeridos(res.data);
+        setMostrarDropdownFiltro(true);
+      })
+      .catch(err => console.error("Erro ao buscar pets para filtro", err));
+  } else {
+    setMostrarDropdownFiltro(false);
+  }
+}, [termoPetFiltro]);
+
+// Função para selecionar o pet no filtro
+const selecionarPetNoFiltro = (pet) => {
+  setPetSelecionadoFiltro(pet);
+  setFiltros({ ...filtros, texto: pet.nome }); // Opcional: preenche o texto com o nome
+  setTermoPetFiltro('');
+  setMostrarDropdownFiltro(false);
+};
+
+
+
+  // Estados dos Filtros (Valores temporários antes do clique em Buscar)
+  const [filtros, setFiltros] = useState({
+    texto: '',
+    status: 'Todos',
+    vet: 'Todos',
+    dataInicio: '',
+    dataFim: '',
+    horaInicio: '',
+    horaFim: ''
+  });
 
   // Controle do Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +65,9 @@ export default function GerenciarAgendamentos() {
         api.get('/usuarios')
       ]);
 
-      setAgendamentos(Array.isArray(resAgenda.data) ? resAgenda.data : []);
+      const lista = Array.isArray(resAgenda.data) ? resAgenda.data : [];
+      setAgendamentos(lista);
+      setAgendamentosExibidos(lista); // Inicialmente mostra tudo
       setVeterinarios(Array.isArray(resVets.data) ? resVets.data.filter((u) => u.role === 'VETERINARIO') : []);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -45,13 +80,40 @@ export default function GerenciarAgendamentos() {
     carregarDados();
   }, [carregarDados]);
 
-  const limparFiltros = () => {
-    setFiltroTexto('');
-    setFiltroStatus('Todos');
-    setFiltroVet('Todos');
-    setFiltroData('');
-    setFiltroHorario('');
-  };
+ const aplicarFiltros = () => {
+  const filtrados = agendamentos.filter((ag) => {
+    const petNomeBanco = ag.petNome || ag.pet?.nome || '';
+    const veterinarioNome = ag.veterinarioNome || ag.veterinario?.nome || '';
+    const dataBanco = ag.data ? ag.data.substring(0, 10) : '';
+    const horarioBanco = ag.horario ? ag.horario.substring(0, 5) : '';
+
+    const batePet = petSelecionadoFiltro 
+      ? ag.petId === petSelecionadoFiltro.id 
+      : petNomeBanco.toLowerCase().includes(filtros.texto.toLowerCase());
+
+    const bateStatus = filtros.status === 'Todos' || ag.status === filtros.status;
+    const bateVet = filtros.vet === 'Todos' || veterinarioNome === filtros.vet;
+    const bateData = (!filtros.dataInicio || dataBanco >= filtros.dataInicio) &&
+                     (!filtros.dataFim || dataBanco <= filtros.dataFim);
+    const bateHorario = (!filtros.horaInicio || horarioBanco >= filtros.horaInicio) &&
+                        (!filtros.horaFim || horarioBanco <= filtros.horaFim);
+
+    return batePet && bateStatus && bateVet && bateData && bateHorario;
+  });
+
+  setAgendamentosExibidos(filtrados);
+};
+
+  // Ajuste na função Limpar Filtros
+const limparFiltros = () => {
+  setFiltros({
+    texto: '', status: 'Todos', vet: 'Todos',
+    dataInicio: '', dataFim: '', horaInicio: '', horaFim: ''
+  });
+  setPetSelecionadoFiltro(null); // Limpa o pet selecionado
+  setTermoPetFiltro('');
+  setAgendamentosExibidos(agendamentos);
+};
 
   const abrirModal = (agendamento, acao) => {
     setAgendamentoSelecionado(agendamento);
@@ -62,32 +124,15 @@ export default function GerenciarAgendamentos() {
   const handleTrocarStatus = async () => {
     try {
       const novoStatus = acaoModal === 'CONFIRMAR' ? 'CONFIRMADO' : 'CANCELADO';
-      await api.patch(`/agendamentos/${agendamentoSelecionado.id}/status`, {
-        status: novoStatus
-      });
-      carregarDados();
+      await api.patch(`/agendamentos/${agendamentoSelecionado.id}/status`, { status: novoStatus });
+      await carregarDados(); // Recarrega e reseta exibição
       setIsModalOpen(false);
     } catch (error) {
       alert('Erro ao atualizar status.');
     }
   };
 
-  const agendamentosFiltrados = agendamentos.filter((ag) => {
-    const petNome = ag.petNome || ag.pet?.nome || '';
-    const veterinarioNome = ag.veterinarioNome || ag.veterinario?.nome || '';
-    const horarioBanco = ag.horario ? ag.horario.substring(0, 5) : '';
-    const dataBanco = ag.data ? ag.data.substring(0, 10) : '';
-
-    const bateTexto = petNome.toLowerCase().includes(filtroTexto.toLowerCase());
-    const bateStatus = filtroStatus === 'Todos' || ag.status === filtroStatus;
-    const bateVet = filtroVet === 'Todos' || veterinarioNome === filtroVet;
-    const bateData = !filtroData || dataBanco === filtroData;
-    const bateHorario = !filtroHorario || horarioBanco === filtroHorario;
-
-    return bateTexto && bateStatus && bateVet && bateData && bateHorario;
-  });
-
-  const inputFilterClass = "w-full mt-2 h-[34px] p-1.5 text-[11px] font-normal border border-gray-200 rounded-md focus:ring-1 focus:ring-primary-container outline-none bg-white text-on-surface";
+  const inputFilterClass = "w-full p-1 text-[10px] font-normal border border-gray-200 rounded focus:ring-1 focus:ring-primary-container outline-none bg-white text-on-surface";
 
   return (
     <Layout>
@@ -95,7 +140,7 @@ export default function GerenciarAgendamentos() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-3xl font-bold text-on-surface">Agendamentos</h2>
-            <p className="text-on-surface-variant">Agenda em tempo real e filtros rápidos por coluna.</p>
+            <p className="text-on-surface-variant">Gestão de agenda com busca por intervalos de data e hora.</p>
           </div>
           <button
             onClick={() => navigate('/agendamentos/novo')}
@@ -110,28 +155,40 @@ export default function GerenciarAgendamentos() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-outline-variant">
-                <th className="p-4 w-40">
-                  <span className="text-xs font-bold text-on-surface-variant uppercase ml-1">Data</span>
-                  <input type="date" className={inputFilterClass} value={filtroData} onChange={(e) => setFiltroData(e.target.value)} />
+                {/* FILTRO DATA (Início e Fim) */}
+                <th className="p-3 w-44">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase">Data (De/Até)</span>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <input type="date" className={inputFilterClass} value={filtros.dataInicio} onChange={(e) => setFiltros({...filtros, dataInicio: e.target.value})} />
+                    <input type="date" className={inputFilterClass} value={filtros.dataFim} onChange={(e) => setFiltros({...filtros, dataFim: e.target.value})} />
+                  </div>
                 </th>
-                <th className="p-4 w-32">
-                  <span className="text-xs font-bold text-on-surface-variant uppercase ml-1">Horário</span>
-                  <input type="time" className={inputFilterClass} value={filtroHorario} onChange={(e) => setFiltroHorario(e.target.value)} />
+
+                {/* FILTRO HORÁRIO (Início e Fim) */}
+                <th className="p-3 w-32">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase">Horário</span>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <input type="time" className={inputFilterClass} value={filtros.horaInicio} onChange={(e) => setFiltros({...filtros, horaInicio: e.target.value})} />
+                    <input type="time" className={inputFilterClass} value={filtros.horaFim} onChange={(e) => setFiltros({...filtros, horaFim: e.target.value})} />
+                  </div>
                 </th>
-                <th className="p-4 w-56">
-                  <span className="text-xs font-bold text-on-surface-variant uppercase ml-1">Paciente</span>
-                  <input type="text" placeholder="Filtrar..." className={inputFilterClass} value={filtroTexto} onChange={(e) => setFiltroTexto(e.target.value)} />
+
+                <th className="p-3 w-56">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase">Paciente</span>
+                  <input type="text" placeholder="Nome..." className={`${inputFilterClass} mt-1 h-[26px]`} value={filtros.texto} onChange={(e) => setFiltros({...filtros, texto: e.target.value})} />
                 </th>
-                <th className="p-4">
-                  <span className="text-xs font-bold text-on-surface-variant uppercase ml-1">Veterinário</span>
-                  <select className={inputFilterClass} value={filtroVet} onChange={(e) => setFiltroVet(e.target.value)}>
+
+                <th className="p-3">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase">Veterinário</span>
+                  <select className={`${inputFilterClass} mt-1 h-[26px]`} value={filtros.vet} onChange={(e) => setFiltros({...filtros, vet: e.target.value})}>
                     <option value="Todos">Todos</option>
                     {veterinarios.map((v) => <option key={v.id} value={v.nome}>{v.nome}</option>)}
                   </select>
                 </th>
-                <th className="p-4 w-40">
-                  <span className="text-xs font-bold text-on-surface-variant uppercase ml-1">Status</span>
-                  <select className={inputFilterClass} value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
+
+                <th className="p-3 w-36">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase">Status</span>
+                  <select className={`${inputFilterClass} mt-1 h-[26px]`} value={filtros.status} onChange={(e) => setFiltros({...filtros, status: e.target.value})}>
                     <option value="Todos">Todos</option>
                     <option value="AGENDADO">Agendado</option>
                     <option value="CONFIRMADO">Confirmado</option>
@@ -139,16 +196,22 @@ export default function GerenciarAgendamentos() {
                     <option value="CONCLUIDO">Concluído</option>
                   </select>
                 </th>
-                <th className="p-4 w-32 text-center">
-                  <span className="text-xs font-bold text-on-surface-variant uppercase">Ações</span>
-                  <button onClick={limparFiltros} className="w-full mt-2 h-[34px] text-[10px] font-bold bg-primary-container text-white rounded-md hover:bg-orange-600 transition shadow-sm">
-                    Limpar
-                  </button>
+
+                {/* COLUNA DE AÇÕES COM BOTÃO BUSCAR */}
+                <th className="p-3 w-36 text-center align-bottom">
+                   <div className="flex flex-col gap-1">
+                      <button onClick={aplicarFiltros} className="w-full h-7 bg-primary-container text-white text-[10px] font-bold rounded hover:bg-orange-600 transition shadow-sm flex items-center justify-center gap-1">
+                        <span className="material-symbols-outlined text-sm">search</span> Buscar
+                      </button>
+                      <button onClick={limparFiltros} className="w-full h-7 border border-gray-200 text-gray-500 text-[10px] font-bold rounded hover:bg-gray-50 transition">
+                        Limpar
+                      </button>
+                   </div>
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {!loading && agendamentosFiltrados.map((ag) => (
+              {!loading && agendamentosExibidos.map((ag) => (
                 <tr key={ag.id} className="hover:bg-orange-50/20 transition-colors">
                   <td className="p-4 font-bold text-on-surface text-sm">
                     {ag.data?.substring(0, 10).split('-').reverse().join('/')}
@@ -159,17 +222,17 @@ export default function GerenciarAgendamentos() {
                   <td className="p-4 font-bold text-on-surface">{ag.petNome || ag.pet?.nome}</td>
                   <td className="p-4 text-sm text-on-surface-variant">{ag.veterinarioNome || ag.veterinario?.nome}</td>
                   <td className="p-4"><StatusBadge status={ag.status} /></td>
-                  <td className="p-4">
+                  <td className="p-4 text-center">
                     <div className="flex justify-center gap-1">
+                      {ag.status !== 'CONFIRMADO' && ag.status !== 'CONCLUIDO' && (
+                        <button onClick={() => abrirModal(ag, 'CONFIRMAR')} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-full transition-colors" title="Confirmar">
+                          <span className="material-symbols-outlined text-[20px]">check_circle</span>
+                        </button>
+                      )}
                       {ag.status !== 'CANCELADO' && ag.status !== 'CONCLUIDO' && (
-                        <>
-                          <button onClick={() => abrirModal(ag, 'CONFIRMAR')} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-full transition-colors" title="Confirmar">
-                            <span className="material-symbols-outlined text-[20px]">check_circle</span>
-                          </button>
-                          <button onClick={() => abrirModal(ag, 'CANCELAR')} className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors" title="Cancelar">
-                            <span className="material-symbols-outlined text-[20px]">cancel</span>
-                          </button>
-                        </>
+                        <button onClick={() => abrirModal(ag, 'CANCELAR')} className="p-1.5 text-red-600 hover:bg-red-50 rounded-full transition-colors" title="Cancelar">
+                          <span className="material-symbols-outlined text-[20px]">cancel</span>
+                        </button>
                       )}
                       <button onClick={() => navigate(`/agendamentos/editar/${ag.id}`)} className="p-1.5 text-gray-400 hover:text-primary transition-colors" title="Editar">
                         <span className="material-symbols-outlined text-[20px]">edit</span>
@@ -180,46 +243,31 @@ export default function GerenciarAgendamentos() {
               ))}
             </tbody>
           </table>
-          {!loading && agendamentosFiltrados.length === 0 && (
-            <div className="p-20 text-center text-gray-500 italic">Nenhum agendamento encontrado.</div>
+          {!loading && agendamentosExibidos.length === 0 && (
+            <div className="p-20 text-center text-gray-500 italic">Nenhum agendamento encontrado para os filtros.</div>
           )}
         </div>
       </div>
 
-      {/* MODAL DE CONFIRMAÇÃO (O que estava faltando) */}
+      {/* MODAL DE CONFIRMAÇÃO (Mantenha o mesmo que você já tinha) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-orange-100 animate-entrance">
-            <div className="flex flex-col items-center text-center">
-              <div className={`p-4 rounded-full mb-6 ${acaoModal === 'CONFIRMAR' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
-                <span className="material-symbols-outlined text-5xl">
-                  {acaoModal === 'CONFIRMAR' ? 'verified' : 'event_busy'}
-                </span>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+              {/* Conteúdo do Modal aqui... */}
+              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-orange-100 animate-entrance text-center">
+                  <h3 className="text-xl font-bold mb-4">{acaoModal === 'CONFIRMAR' ? 'Confirmar Presença?' : 'Cancelar Agendamento?'}</h3>
+                  <p className="mb-8 text-sm text-gray-500">Deseja realmente alterar o status para {acaoModal === 'CONFIRMAR' ? 'CONFIRMADO' : 'CANCELADO'}?</p>
+                  <div className="flex gap-4">
+                      <button onClick={() => setIsModalOpen(false)} className="flex-1 py-2 border rounded-xl font-bold text-gray-500">Voltar</button>
+                      <button onClick={handleTrocarStatus} className={`flex-1 py-2 text-white rounded-xl font-bold ${acaoModal === 'CONFIRMAR' ? 'bg-emerald-600' : 'bg-red-600'}`}>Sim, {acaoModal === 'CONFIRMAR' ? 'Confirmar' : 'Cancelar'}</button>
+                  </div>
               </div>
-              <h3 className="text-2xl font-black text-on-surface mb-2">
-                {acaoModal === 'CONFIRMAR' ? 'Confirmar Presença?' : 'Cancelar Agendamento?'}
-              </h3>
-              <p className="text-on-surface-variant text-sm mb-8 leading-relaxed">
-                Deseja alterar o status do agendamento de <span className="font-bold text-on-surface">{agendamentoSelecionado?.petNome || agendamentoSelecionado?.pet?.nome}</span> para 
-                <span className={`font-bold ${acaoModal === 'CONFIRMAR' ? 'text-emerald-600' : 'text-red-600'}`}> {acaoModal === 'CONFIRMAR' ? 'CONFIRMADO' : 'CANCELADO'}</span>?
-              </p>
-              <div className="flex gap-4 w-full">
-                <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 border-2 border-gray-100 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-all">Voltar</button>
-                <button 
-                  onClick={handleTrocarStatus} 
-                  className={`flex-1 py-3 text-white rounded-xl font-black uppercase tracking-wider shadow-lg ${acaoModal === 'CONFIRMAR' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100' : 'bg-red-600 hover:bg-red-700 shadow-red-100'}`}
-                >
-                  {acaoModal === 'CONFIRMAR' ? 'Sim, Confirmar' : 'Sim, Cancelar'}
-                </button>
-              </div>
-            </div>
           </div>
-        </div>
       )}
     </Layout>
   );
 }
 
+// Sub-componentes
 function StatusBadge({ status }) {
   const styles = {
     AGENDADO: 'bg-blue-50 text-blue-600 border-blue-100',

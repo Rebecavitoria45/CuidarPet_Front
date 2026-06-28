@@ -9,6 +9,10 @@ export default function CadastrarPet() {
   const [termoBusca, setTermoBusca] = useState('');
   const [clientesEncontrados, setClientesEncontrados] = useState([]);
   const [mostrarDropdown, setMostrarDropdown] = useState(false);
+  const ESPECIES_PADRAO = [
+  { id: 'CANINA', nome: 'Canina (Cão)' },
+  { id: 'FELINA', nome: 'Felina (Gato)' },
+];
 
   // Estado do formulário
   const [formData, setFormData] = useState({
@@ -124,17 +128,32 @@ export default function CadastrarPet() {
                   </div>
 
                   {/* Espécie */}
-                  <div className="md:col-span-6 space-y-1.5">
-                    <label className="block text-sm font-semibold text-on-surface-variant ml-1">Espécie</label>
-                    <input 
-                      className="w-full h-12 px-4 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all"
-                      name="especie"
-                      value={formData.especie}
-                      onChange={handleChange}
-                      placeholder="Ex: Canina, Felina..."
-                      required
-                    />
-                  </div>
+                 <div className="md:col-span-6 space-y-1.5">
+  <label className="block text-sm font-semibold text-on-surface-variant ml-1">
+    Espécie
+  </label>
+  <div className="relative">
+    <select 
+      className="w-full h-12 px-4 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container outline-none transition-all appearance-none"
+      name="especie"
+      value={formData.especie}
+      onChange={handleChange}
+      required
+    >
+      <option value="">Selecione a espécie</option>
+      {ESPECIES_PADRAO.map(esp => (
+        <option key={esp.id} value={esp.id}>
+          {esp.nome}
+        </option>
+      ))}
+    </select>
+    
+    {/* Ícone de seta para indicar que é um select */}
+    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+      keyboard_arrow_down
+    </span>
+  </div>
+</div>
 
                   {/* Raça */}
                   <div className="md:col-span-6 space-y-1.5">
