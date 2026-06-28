@@ -104,7 +104,6 @@ const selecionarPetNoFiltro = (pet) => {
   setAgendamentosExibidos(filtrados);
 };
 
-  // Ajuste na função Limpar Filtros
 const limparFiltros = () => {
   setFiltros({
     texto: '', status: 'Todos', vet: 'Todos',
@@ -249,10 +248,9 @@ const limparFiltros = () => {
         </div>
       </div>
 
-      {/* MODAL DE CONFIRMAÇÃO (Mantenha o mesmo que você já tinha) */}
+      {/* MODAL DE CONFIRMAÇÃO */}
       {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-              {/* Conteúdo do Modal aqui... */}
               <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 border border-orange-100 animate-entrance text-center">
                   <h3 className="text-xl font-bold mb-4">{acaoModal === 'CONFIRMAR' ? 'Confirmar Presença?' : 'Cancelar Agendamento?'}</h3>
                   <p className="mb-8 text-sm text-gray-500">Deseja realmente alterar o status para {acaoModal === 'CONFIRMAR' ? 'CONFIRMADO' : 'CANCELADO'}?</p>

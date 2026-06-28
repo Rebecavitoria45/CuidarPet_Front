@@ -26,7 +26,7 @@ export default function EditarPet() {
     clienteId: '' 
   });
 
-  // 1. Carregar dados do Pet ao iniciar
+  // Carregar dados do Pet
   useEffect(() => {
     const carregarPet = async () => {
       try {
@@ -55,7 +55,6 @@ export default function EditarPet() {
     carregarPet();
   }, [id, navigate]);
 
-  //  Lógica de busca de novo tutor 
   useEffect(() => {
     if (termoBusca.length > 2) {
       api.get(`/clientes`).then(response => {

@@ -31,7 +31,6 @@ export default function CadastrarPet() {
   // Busca clientes conforme o usuário digita
   useEffect(() => {
     if (termoBusca.length > 2) {
-        // Faz a busca no backend agora!
         api.get(`/clientes/buscar?nome=${termoBusca}`)
             .then(response => {
                 setClientesEncontrados(response.data);
