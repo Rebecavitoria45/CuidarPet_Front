@@ -9,6 +9,8 @@ export default function GerenciarUsuarios() {
   // ESTADOS PARA O MODAL
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
+  const usuarioLogado = JSON.parse(localStorage.getItem('user') || '{}');
+ 
 
   // Carregar usuários ao abrir a tela
   const carregarUsuarios = useCallback( async () => {
@@ -53,7 +55,7 @@ export default function GerenciarUsuarios() {
 
   return (
     <Layout>
-      <div className="animate-entrance">
+      <div className="w-full animate-entrance">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-lg">
           <div>
@@ -86,12 +88,15 @@ export default function GerenciarUsuarios() {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {usuarios.map((user) => (
-                <tr key={user.id} className={`transition-colors hover:bg-orange-50/30 ${!user.ativo ? 'opacity-70 bg-gray-50' : ''}`}>
-                  <td className="px-6 py-4">
-                      {user.admin && (
-                        <span 
-                          className="material-symbols-outlined text-amber-500 text-[18px]" 
+              {usuarios.map((user) => {
+                 const ehOProprioUsuario = user.id === usuarioLogado.id; 
+
+                return (
+                  <tr key={user.id} className={`transition-colors hover:bg-orange-50/30 ${!user.ativo ? 'opacity-70 bg-gray-50' : ''}`}>
+                    <td className="px-6 py-4">
+                        {user.admin && (
+                          <span 
+                            className="material-symbols-outlined text-amber-500 text-[18px]" 
                            title="Administrador"
                            style={{ fontVariationSettings: "'FILL' 1" }} // Deixa o ícone preenchido
                             >
@@ -116,19 +121,26 @@ export default function GerenciarUsuarios() {
                       <button className="p-2 text-on-surface-variant hover:text-primary transition-all" button onClick={() => window.location.href = `/usuarios/editar/${user.id}`}>
                         <span className="material-symbols-outlined">edit</span>
                       </button>
-                      <button 
-                        onClick={() => abrirConfirmacao(user)}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg font-bold transition-all ${user.ativo ? 'text-red-600 hover:bg-red-50' : 'text-secondary hover:bg-teal-50'}`}
-                      >
-                        <span className="material-symbols-outlined text-[20px]">
-                          {user.ativo ? 'block' : 'check_circle'}
-                        </span>
-                        <span className="text-xs">{user.ativo ? 'Desativar' : 'Ativar'}</span>
-                      </button>
+                      
+                        <button 
+              onClick={() => !ehOProprioUsuario && abrirConfirmacao(user)}
+              disabled={ehOProprioUsuario}
+              title={ehOProprioUsuario ? "Você não pode desativar sua própria conta" : ""}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg font-bold transition-all 
+                ${ehOProprioUsuario 
+                  ? 'opacity-20 cursor-not-allowed grayscale' 
+                  : user.ativo ? 'text-red-600 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'
+                }`}
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {user.ativo ? 'block' : 'check_circle'}
+              </span>
+              <span className="text-xs">{user.ativo ? 'Desativar' : 'Ativar'}</span>
+            </button>
                     </div>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
           {usuarios.length === 0 && !loading && (

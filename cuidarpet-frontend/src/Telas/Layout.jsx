@@ -3,7 +3,7 @@ import Sidebar from '../components/MenuLateral';
 
 export default function Layout({ children }) {
   return (
-    <div className="flex min-h-screen bg-[#f3faff]">
+    <div className="flex min-h-screen ">
       <Sidebar />
 
       {/* 

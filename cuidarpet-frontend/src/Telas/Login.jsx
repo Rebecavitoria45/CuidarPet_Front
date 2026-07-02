@@ -47,7 +47,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3faff] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Elementos Decorativos de Fundo */}
       <div className="fixed inset-0 pointer-events-none opacity-10">
         <span className="material-symbols-outlined absolute text-[240px] -top-20 -left-20 text-[#964900] -rotate-12">

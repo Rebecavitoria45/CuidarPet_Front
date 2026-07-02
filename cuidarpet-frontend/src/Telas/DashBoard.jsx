@@ -131,6 +131,7 @@ export default function Dashboard() {
         </section>
 
         {/* Ações Rápidas */}
+        {(isAdmin || isAtendente) && (
         <aside className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm h-fit">
           <h4 className="text-xl font-bold mb-6">Ações Rápidas</h4>
           <div className="space-y-3">
@@ -140,9 +141,12 @@ export default function Dashboard() {
             {(isAdmin || isAtendente) && (
               <QuickActionButton icon="person_pin" label="Novo Cliente" onClick={() => navigate('/clientes/cadastro')} />
             )}
-            <QuickActionButton icon="event_repeat" label="Marcar Consulta" onClick={() => navigate('/agendamentos/novo')} />
+            {(isAdmin || isAtendente) && (
+              <QuickActionButton icon="event_repeat" label="Marcar Consulta" onClick={() => navigate('/agendamentos/novo')} />
+            )}
           </div>
         </aside>
+        )}
       </div>
     </div>
   );

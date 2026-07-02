@@ -235,7 +235,7 @@ export default function CadastrarAgendamento() {
                       onClick={() => setFormData({...formData, horario: h})}
                       className={`py-3 rounded-xl text-sm font-bold transition-all border ${
                         estaOcupado 
-                          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed line-through' 
+                          ? 'bg-gray-300 text-gray-600 border-gray-400 cursor-not-allowed line-through' 
                           : estaSelecionado 
                             ? 'bg-primary-container text-white border-primary shadow-lg scale-95' 
                             : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-orange-50 hover:border-orange-200'
@@ -247,7 +247,7 @@ export default function CadastrarAgendamento() {
                 })}
               </div>
 
-              {/* Legenda Atualizada */}
+              {/* Legenda  */}
               <div className="mt-6 flex flex-wrap gap-4 text-[10px] uppercase font-bold text-gray-400 border-t pt-4">
                 <div className="flex items-center gap-1">
                   <div className="w-2.5 h-2.5 bg-primary-container rounded"></div> Selecionado
@@ -256,7 +256,7 @@ export default function CadastrarAgendamento() {
                   <div className="w-2.5 h-2.5 bg-gray-50 border border-gray-200 rounded"></div> Livre
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-2.5 h-2.5 bg-gray-200 rounded"></div> 
+                  <div className="w-2.5 h-2.5 bg-gray-300 rounded"></div> 
                   <span className="line-through">Ocupado</span>
                 </div>
               </div>
