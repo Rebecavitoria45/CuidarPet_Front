@@ -181,7 +181,7 @@ export default function CadastrarAgendamento() {
                       setTermoPet('');
                     }} className="w-full text-left px-4 py-3 hover:bg-orange-50 border-b border-gray-50 flex justify-between items-center transition-colors">
                       <span className="font-bold text-on-surface">{p.nome}</span>
-                      <span className="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 uppercase">{p.tutorNome}</span>
+                      <span className="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 uppercase">{"Tutor: " + p.tutorNome}</span>
                     </button>
                   ))}
                 </div>

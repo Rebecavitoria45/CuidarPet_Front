@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [totalPets, setTotalPets] = useState(0);
   const [agendamentosDoDia, setAgendamentosDoDia] = useState([]); // Apenas os de hoje
   const [loading, setLoading] = useState(true);
+  const [totalConcluidos, setTotalConcluidos] = useState(0);
 
   const isAdmin = user.admin;
   const isAtendente = user.role === 'ATENDENTE';
@@ -20,20 +21,29 @@ export default function Dashboard() {
     
     const hoje = new Date().toLocaleDateString('en-CA'); // Retorna YYYY-MM-DD exatamente
 
-    // 2. Busca usuários (Admin apenas)
+    //Busca usuários (Admin apenas)
     if (isAdmin) {
       api.get('/usuarios').then(res => setTotalUsuarios(res.data.length)).catch(console.error);
     }
+  // Busca todos os agendamentos para estatística histórica
+    api.get('/agendamentos')
+      .then(response => {
+        const todosAgendamentos = Array.isArray(response.data) ? response.data : [];
+        // Filtra os agendamentos com status CONCLUIDO
+        const concluidos = todosAgendamentos.filter(ag => ag.status === 'CONCLUIDO').length;
+        setTotalConcluidos(concluidos);
+      })
+      .catch(err => console.error("Erro ao buscar estatísticas de agendamentos", err));
 
-    // 3. Busca Clientes (Admin/Atendente)
+    //Busca Clientes (Admin/Atendente)
     if (isAdmin || isAtendente) {
       api.get('/clientes').then(res => setTotalClientes(res.data.length)).catch(console.error);
     }
 
-    // 4. Busca Pets
+    //Busca Pets
     api.get('/pets').then(res => setTotalPets(res.data.length)).catch(console.error);
 
-    // 5. Busca Agendamentos de HOJE usando o endpoint de data que criamos
+    // Busca Agendamentos de HOJE usando o endpoint de data 
     api.get(`/agendamentos/data?data=${hoje}`)
       .then(response => {
         setAgendamentosDoDia(Array.isArray(response.data) ? response.data : []);
@@ -65,7 +75,22 @@ export default function Dashboard() {
           <StatCard icon="person_add" label="Clientes cadastrados" value={totalClientes} color="bg-primary-container/10 text-primary-container" />
         )}
 
-        <StatCard icon="pets" label="Pets Cadastrados" value={totalPets} color="bg-purple-100 text-purple-600" />
+          {/* LÓGICA DE TROCA DE CARD */}
+  {user.role === 'VETERINARIO' && !isAdmin ? (
+    <StatCard 
+      icon="task_alt" 
+      label="Consultas Finalizadas" 
+      value={totalConcluidos} 
+      color="bg-purple-100 text-purple-600" 
+    />
+  ) : (
+    <StatCard 
+      icon="pets" 
+      label="Pets Cadastrados" 
+      value={totalPets} 
+      color="bg-purple-100 text-purple-600" 
+    />
+  )}
         
         {/* Card Laranja: Mostra a contagem de HOJE */}
         <div className="bg-primary-container p-6 rounded-xl shadow-xl flex flex-col justify-between text-white">
@@ -170,7 +195,7 @@ function QuickActionButton({ icon, label, onClick }) {
      return (
     <button 
       onClick={onClick} // <--- Aplica a função ao clique do botão real
-      className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl group hover:bg-primary-container hover:text-white transition-all active:scale-95"
+      className="w-full flex items-center justify-between p-4 bg-slate-200 border border-slate-200 rounded-xl group hover:bg-primary-container hover:text-white transition-all active:scale-95 shadow-sm"
     >
       <div className="flex items-center gap-3">
         <span className="material-symbols-outlined text-primary-container group-hover:text-white">{icon}</span>

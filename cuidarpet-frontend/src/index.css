@@ -5,7 +5,7 @@
 @layer base {
   body {
     @apply min-h-screen flex items-center justify-center;
-      background-color: #e6ecf0; 
+      background-color: #d6dce0; 
     background-image: radial-gradient(circle at 2px 2px, #d2e0f4 1px, transparent 0);
     background-size: 40px 40px;
     font-family: 'Inter', sans-serif;
