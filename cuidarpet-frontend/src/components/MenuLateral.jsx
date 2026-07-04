@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 export default function Sidebar() {
   const navigate = useNavigate();
   
-  // Pegamos os dados do usuário (ex: { nome: "...", role: "VETERINARIO", admin: false })
   const userData = JSON.parse(localStorage.getItem('user') || '{}');
   
   const isAdmin = userData.admin;
@@ -25,7 +24,7 @@ export default function Sidebar() {
 
       <nav className="flex-1 flex flex-col gap-2">
         
-        {/* 1. VISÃO GERAL - Sempre Visível */}
+        {/*VISÃO GERAL - Sempre Visível */}
         <NavLink to="/dashboard" className={({ isActive }) => `${baseClass} ${isActive ? activeClass : ''}`}>
           <span className="material-symbols-outlined">dashboard</span>
           <span className="text-sm font-medium">Visão Geral</span>
@@ -39,7 +38,7 @@ export default function Sidebar() {
           </NavLink>
         )}
 
-        {/* 3. CLIENTES E PETS - Escondidos se for Veterinário (a menos que seja Admin) */}
+        {/* CLIENTES E PETS - Escondidos se for Veterinário (a menos que seja Admin) */}
         {(!isVeterinario || isAdmin) && (
           <>
             <NavLink to="/clientes" className={({ isActive }) => `${baseClass} ${isActive ? activeClass : ''}`}>
@@ -54,7 +53,7 @@ export default function Sidebar() {
           </>
         )}
 
-        {/* 4. AGENDAMENTOS - Sempre Visível para todos */}
+        {/* AGENDAMENTOS - Visível para todos */}
         <NavLink to="/agendamentos" className={({ isActive }) => `${baseClass} ${isActive ? activeClass : ''}`}>
           <span className="material-symbols-outlined">calendar_month</span>
           <span className="text-sm font-medium">Agendamentos</span>

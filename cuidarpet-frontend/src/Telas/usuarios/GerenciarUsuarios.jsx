@@ -10,23 +10,36 @@ export default function GerenciarUsuarios() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
   const usuarioLogado = JSON.parse(localStorage.getItem('user') || '{}');
- 
+  const [totalGeral, setTotalGeral] = useState(0);
+  const [totalAtivos, setTotalAtivos] = useState(0);
 
-  // Carregar usuários ao abrir a tela
-  const carregarUsuarios = useCallback( async () => {
+
+   const carregarDados = useCallback(async () => {
     try {
-      const response = await api.get('/usuarios');
-      setUsuarios(response.data);
+      setLoading(true);
+
+      const [resLista, resTotal, resAtivos] = await Promise.all([
+        api.get('/usuarios'),
+        api.get('/usuarios/contar'),
+        api.get('/usuarios/contar/ativos')
+      ]);
+
+      setUsuarios(resLista.data);
+      setTotalGeral(resTotal.data);
+      setTotalAtivos(resAtivos.data);
     } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
+      console.error("Erro ao buscar dados:", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-  carregarUsuarios();
-}, [carregarUsuarios]);
+    carregarDados();
+  }, [carregarDados]);
+
+  // Lógica de cálculo para os desativados baseada nos resultados da API
+  const totalDesativados = totalGeral - totalAtivos;
 
   
    const abrirConfirmacao = (user) => {
@@ -34,13 +47,13 @@ export default function GerenciarUsuarios() {
     setIsModalOpen(true);
   };
 
-  // 2. Função que EXECUTA a chamada na API (chamada pelo botão "Confirmar" do modal)
+  // Função que EXECUTA a chamada na API (chamada pelo botão "Confirmar" do modal)
   const executarTrocaStatus = async () => {
     if (!usuarioSelecionado) return;
     
     try {
       await api.patch(`/usuarios/${usuarioSelecionado.id}/status`);
-      carregarUsuarios();
+      carregarDados();
       setIsModalOpen(false); // Fecha o modal após o sucesso
     } catch (error) {
       console.error(error);
@@ -48,10 +61,6 @@ export default function GerenciarUsuarios() {
     }
   };
 
-  // Cálculos das estatísticas
-  const total = usuarios.length;
-  const ativos = usuarios.filter(u => u.ativo).length;
-  const desativados = usuarios.filter(u => !u.ativo).length;
 
   return (
     <Layout>
@@ -70,9 +79,9 @@ export default function GerenciarUsuarios() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <StatBox label="Total de Usuários" value={total} color="text-primary" />
-          <StatBox label="Usuários Ativos" value={ativos} color="text-secondary" />
-          <StatBox label="Usuários Desativados" value={desativados} color="text-outline" />
+          <StatBox label="Total de Usuários" value={totalGeral} color="text-primary" />
+          <StatBox label="Usuários Ativos" value={totalAtivos} color="text-secondary" />
+          <StatBox label="Usuários Desativados" value={totalDesativados} color="text-outline" />
         </div>
 
         {/* Users Table */}

@@ -45,11 +45,12 @@ export default function EditarAgendamento() {
       atual.setMinutes(atual.getMinutes() + configAgenda.intervalo);
     }
     return slots;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const horariosDisponiveis = gerarHorarios();
 
-  // 1. Carregar dados iniciais (Agendamento e Veterinários)
+  //Carregar dados iniciais (Agendamento e Veterinários)
   useEffect(() => {
     const carregarDadosIniciais = async () => {
       try {
@@ -83,7 +84,7 @@ export default function EditarAgendamento() {
     carregarDadosIniciais();
   }, [id, navigate]);
 
-  // 2. Buscar horários ocupados (Sempre que mudar Vet ou Data)
+  //  Buscar horários ocupados (Sempre que mudar Vet ou Data)
   useEffect(() => {
     if (formData.veterinarioId && formData.data) {
       api.get(`/agendamentos/horarios-ocupados`, {

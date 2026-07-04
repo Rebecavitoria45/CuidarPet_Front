@@ -19,22 +19,23 @@ export default function GerenciarClientes() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clienteParaExcluir, setClienteParaExcluir] = useState(null);
 
-  // Carregar os 5 recentes
+   //CARREGAR DADOS INICIAIS (Recentes + Contagem Total)
   const carregarDadosIniciais = useCallback(async () => {
     try {
       setLoading(true);
       setIsPesquisaAtiva(false);
       setTermoBusca('');
       
-      // Chamada para o endpoint de recentes que criamos no Java
-      const response = await api.get('/clientes/recentes');
-      setClientes(response.data);
+      const [resRecentes, resContagem] = await Promise.all([
+        api.get('/clientes/recentes'),
+        api.get('/clientes/contar')
+      ]);
 
-        const resTodos = await api.get('/clientes');
-       setTotalGeral(resTodos.data.length);
+      setClientes(resRecentes.data);
+      setTotalGeral(resContagem.data); 
 
     } catch (error) {
-      console.error("Erro ao carregar clientes recentes:", error);
+      console.error("Erro ao carregar dados de clientes:", error);
       setClientes([]);
     } finally {
       setLoading(false);
@@ -44,6 +45,7 @@ export default function GerenciarClientes() {
   useEffect(() => {
     carregarDadosIniciais();
   }, [carregarDadosIniciais]);
+
 
   // Função de Busca Manual
   const handleSearch = async (e) => {

@@ -22,26 +22,19 @@ export default function Dashboard() {
     const hoje = new Date().toLocaleDateString('en-CA'); // Retorna YYYY-MM-DD exatamente
 
     //Busca usuários (Admin apenas)
-    if (isAdmin) {
-      api.get('/usuarios').then(res => setTotalUsuarios(res.data.length)).catch(console.error);
+     if (isAdmin) {
+        api.get('/usuarios/contar').then(res => setTotalUsuarios(res.data)).catch(console.error);
     }
-  // Busca todos os agendamentos para estatística histórica
-    api.get('/agendamentos')
-      .then(response => {
-        const todosAgendamentos = Array.isArray(response.data) ? response.data : [];
-        // Filtra os agendamentos com status CONCLUIDO
-        const concluidos = todosAgendamentos.filter(ag => ag.status === 'CONCLUIDO').length;
-        setTotalConcluidos(concluidos);
-      })
-      .catch(err => console.error("Erro ao buscar estatísticas de agendamentos", err));
+  // Busca contagem dos agendamentos concluidos para estatística histórica
+      api.get('/agendamentos/concluidos/contar').then(res => setTotalConcluidos(res.data)).catch(console.error);
 
     //Busca Clientes (Admin/Atendente)
     if (isAdmin || isAtendente) {
-      api.get('/clientes').then(res => setTotalClientes(res.data.length)).catch(console.error);
+        api.get('/clientes/contar').then(res => setTotalClientes(res.data)).catch(console.error);
     }
 
     //Busca Pets
-    api.get('/pets').then(res => setTotalPets(res.data.length)).catch(console.error);
+      api.get('/pets/contar').then(res => setTotalPets(res.data)).catch(console.error);
 
     // Busca Agendamentos de HOJE usando o endpoint de data 
     api.get(`/agendamentos/data?data=${hoje}`)
@@ -194,7 +187,7 @@ function StatCard({ icon, label, value, color }) {
 function QuickActionButton({ icon, label, onClick }) {
      return (
     <button 
-      onClick={onClick} // <--- Aplica a função ao clique do botão real
+      onClick={onClick}
       className="w-full flex items-center justify-between p-4 bg-slate-200 border border-slate-200 rounded-xl group hover:bg-primary-container hover:text-white transition-all active:scale-95 shadow-sm"
     >
       <div className="flex items-center gap-3">
