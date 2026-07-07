@@ -59,4 +59,12 @@ Após iniciar o servidor, acesse:
 ```text
 http://localhost:5173
 ```
+## 👨‍💻 Desenvolvido por
 
+Projeto desenvolvido para a disciplina Análise e Projeto de sistemas do curso Análise e desenvolvimento de Sistemas IFPE Campus Paulista, com foco na gestão de clínicas veterinárias.
+<br>Integrantes: 
+<strong><br> Klarisse Maria Matias do Nascimento - GitHub: klarisse90
+<br> Carlos Eduardo Bento de Oliveira - Github: SolrakEdward
+<br>Rebeca Vitória do Nascimento Silva - GIthub: Rebecavitoria45
+<br>Yara Sthefany Rodrigues da Silva - Github: sthefany1004
+</strong>
